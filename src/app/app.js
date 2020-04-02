@@ -7,6 +7,9 @@ const app = express()
 app.use(bodyParser.json())
 
 
+console.log('Servidor corriendo')
+
+
 
 
 module.exports = app
