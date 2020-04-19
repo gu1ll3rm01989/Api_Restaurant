@@ -1,9 +1,9 @@
 const config = {
-    SERVER_PORT: 3000,
+    SERVER_PORT: process.env.PORT || 3000,
     DDBB: {
         NAME: 'delilah',
         USER: 'root',
-        PASS: '',
+        PASS: 'root',
         PORT: '3306',
         HOST: '127.0.0.1'
     },
