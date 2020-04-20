@@ -1,8 +1,9 @@
 const sequelize = require ('../db.conection')
 const express = require ('express')
 const router = express.Router()
-const DbQuerys = require ('./login.controller')
+const controller = require ('./login.controller')
 const jwt = require ('jsonwebtoken')
+const tokenAuthentication = require ('../../middlewares/jwt.authentication')
 
 
 const errorLogin = 'Incorrect data or unregistered user'
@@ -10,29 +11,33 @@ const loginSucesfull = 'Login User'
 router  
         .post('/login', async (req, res) => {
                 try {
-                        const login = req.body
-                        await DbQuerys.loginUsers(sequelize, login)
-                        console.log(login)
                         const {username} = req.body
-                        console.log(username)
-                        await DbQuerys.loginRegistration(sequelize, username)
-                        console.log(usernameValid[0])
-
-                        if (username == usernameValid[0]) {
-                            res.json({loginSucesfull})
-                        }
-                        else {
-                            res.json({errorLogin})
-                        }
-                } catch (error) {
-                    res.status(500).json({error: errorLogin})
-                    
+                        await controller.userAuthentication(sequelize, username)
+                        console.log(userNameValid,'USER ID LOGIN')                      
+                            if (userNameValid === username) {
+                                const {pass} = req.body
+                                await controller.passAuthentication(sequelize, pass, username)
+                                console.log(passValid,'PASS LOGIN')
+                                    if (passValid === pass) {
+                                        await controller.generateToken(sequelize, username)
+                                        res.json({loginSucesfull, "token": token})
+                                        await controller.adminRol(sequelize, username)
+                                        console.log(userRolValid,'ROL USER')
+                                    }else{
+                                        res.json({errorLogin})
+                                    }
+                            }else{
+                                res.json({errorLogin})
+                            }                                 
+                        
+                } catch (error) {                    
+                    res.json({errorLogin})
                 }
         })
 
 
-        .post('/login/protected', DbQuerys.loginAuthentication ,(req, res) => {
-            res.json({test: 'ESTA ES UNA PAGINA AUTENTICADA'})
+        .post('/login/protected', tokenAuthentication.loginAuthentication ,(req, res) => {
+            res.json({messagge: 'THIS IS AN AUTHENTICATED PAGE'})
         })
 
         

@@ -18,13 +18,28 @@ CREATE SCHEMA IF NOT EXISTS `delilah` DEFAULT CHARACTER SET utf8 ;
 USE `delilah` ;
 
 -- -----------------------------------------------------
+-- Table `delilah`.`product`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `delilah`.`product` (
+  `product_id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `product_name` VARCHAR(45) NOT NULL,
+  `product_price` FLOAT NOT NULL,
+  PRIMARY KEY (`product_id`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 14
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
 -- Table `delilah`.`rol`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `delilah`.`rol` (
-  `rol_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rol_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `rol_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`rol_id`))
-ENGINE = InnoDB;
+ENGINE = InnoDB
+AUTO_INCREMENT = 3
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -36,20 +51,43 @@ CREATE TABLE IF NOT EXISTS `delilah`.`user` (
   `user_mail` VARCHAR(255) NOT NULL,
   `user_phone` INT(11) NOT NULL,
   `user_address` TEXT NOT NULL,
-  `user_user` VARCHAR(255) NOT NULL,
-  `login_login_id` BIGINT(20) UNSIGNED NOT NULL,
-  `rol_rol_id` INT UNSIGNED NOT NULL,
+  `user_username` VARCHAR(255) NOT NULL,
+  `user_pass` VARCHAR(255) NULL DEFAULT NULL,
+  `rol_id` INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE INDEX `user_mail_UNIQUE` (`user_mail` ASC) ,
-  UNIQUE INDEX `user_user_UNIQUE` (`user_user` ASC) ,
-  INDEX `fk_user_rol1_idx` (`rol_rol_id` ASC) ,
+  UNIQUE INDEX `user_user_UNIQUE` (`user_username` ASC) ,
+  INDEX `fk_user_rol1_idx` (`rol_id` ASC) ,
   CONSTRAINT `fk_user_rol1`
-    FOREIGN KEY (`rol_rol_id`)
+    FOREIGN KEY (`rol_id`)
     REFERENCES `delilah`.`rol` (`rol_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
+AUTO_INCREMENT = 25
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `delilah`.`favorite`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `delilah`.`favorite` (
+  `product_id` BIGINT(20) UNSIGNED NOT NULL,
+  `user_id` INT(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (`product_id`, `user_id`),
+  INDEX `fk_product_has_user_user1_idx` (`user_id` ASC) ,
+  INDEX `fk_product_has_user_product1_idx` (`product_id` ASC) ,
+  CONSTRAINT `fk_product_has_user_product1`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `delilah`.`product` (`product_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_product_has_user_user1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `delilah`.`user` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -57,12 +95,11 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `delilah`.`login`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `delilah`.`login` (
-  `login_pass` VARCHAR(255) NOT NULL,
-  `login_token` VARCHAR(255) NOT NULL,
-  `user_user_id` INT(10) UNSIGNED NOT NULL,
-  INDEX `fk_login_user1_idx` (`user_user_id` ASC) ,
+  `login_token` VARCHAR(255) NULL DEFAULT NULL,
+  `user_id` INT(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (`user_id`),
   CONSTRAINT `fk_login_user1`
-    FOREIGN KEY (`user_user_id`)
+    FOREIGN KEY (`user_id`)
     REFERENCES `delilah`.`user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -78,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `delilah`.`payment` (
   `payment_method` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`payment_id`))
 ENGINE = InnoDB
+AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -89,6 +127,7 @@ CREATE TABLE IF NOT EXISTS `delilah`.`state` (
   `state_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`state_id`))
 ENGINE = InnoDB
+AUTO_INCREMENT = 6
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -97,92 +136,60 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `delilah`.`order` (
   `order_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_hour` TIME NOT NULL,
+  `user_id` INT(10) UNSIGNED NOT NULL,
+  `product_id` BIGINT(20) UNSIGNED NOT NULL,
+  `order_quantity` INT(10) NOT NULL,
   `order_total` FLOAT NOT NULL,
-  `state_state_id` BIGINT(20) UNSIGNED NOT NULL,
-  `user_user_id` INT(10) UNSIGNED NOT NULL,
-  `payment_payment_id` BIGINT(20) NOT NULL,
+  `order_hour` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `payment_id` BIGINT(20) NOT NULL,
+  `state_id` BIGINT(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`order_id`),
-  INDEX `fk_order_state1_idx` (`state_state_id` ASC) ,
-  INDEX `fk_order_user1_idx` (`user_user_id` ASC) ,
-  INDEX `fk_order_payment1_idx` (`payment_payment_id` ASC) ,
+  INDEX `fk_order_state1_idx` (`state_id` ASC) ,
+  INDEX `fk_order_user1_idx` (`user_id` ASC) ,
+  INDEX `fk_order_payment1_idx` (`payment_id` ASC) ,
+  INDEX `fk_order_product1_idx` (`product_id` ASC) ,
   CONSTRAINT `fk_order_payment1`
-    FOREIGN KEY (`payment_payment_id`)
+    FOREIGN KEY (`payment_id`)
     REFERENCES `delilah`.`payment` (`payment_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
+  CONSTRAINT `fk_order_product1`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `delilah`.`product` (`product_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `fk_order_state1`
-    FOREIGN KEY (`state_state_id`)
+    FOREIGN KEY (`state_id`)
     REFERENCES `delilah`.`state` (`state_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_order_user1`
-    FOREIGN KEY (`user_user_id`)
+    FOREIGN KEY (`user_id`)
     REFERENCES `delilah`.`user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
+AUTO_INCREMENT = 25
 DEFAULT CHARACTER SET = utf8;
 
-
--- -----------------------------------------------------
--- Table `delilah`.`product`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `delilah`.`product` (
-  `product_id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `product_name` VARCHAR(45) NOT NULL,
-  `product_price` FLOAT NOT NULL,
-  PRIMARY KEY (`product_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `delilah`.`favorite`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `delilah`.`favorite` (
-  `favorite_product_id` BIGINT(20) UNSIGNED NOT NULL,
-  `favorite_user_id` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`favorite_product_id`, `favorite_user_id`),
-  INDEX `fk_product_has_user_user1_idx` (`favorite_user_id` ASC) ,
-  INDEX `fk_product_has_user_product1_idx` (`favorite_product_id` ASC) ,
-  CONSTRAINT `fk_product_has_user_product1`
-    FOREIGN KEY (`favorite_product_id`)
-    REFERENCES `delilah`.`product` (`product_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_product_has_user_user1`
-    FOREIGN KEY (`favorite_user_id`)
-    REFERENCES `delilah`.`user` (`user_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `delilah`.`detail_order`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `delilah`.`detail_order` (
-  `detail_order_product_id` BIGINT(20) UNSIGNED NOT NULL,
-  `detail_order_order_id` INT(10) UNSIGNED NOT NULL,
-  `detail_order_subtotal` FLOAT NOT NULL,
-  `detail_order_quantity` INT NOT NULL,
-  PRIMARY KEY (`detail_order_product_id`, `detail_order_order_id`),
-  INDEX `fk_product_has_order_order1_idx` (`detail_order_order_id` ASC) ,
-  INDEX `fk_product_has_order_product1_idx` (`detail_order_product_id` ASC) ,
-  CONSTRAINT `fk_product_has_order_product1`
-    FOREIGN KEY (`detail_order_product_id`)
-    REFERENCES `delilah`.`product` (`product_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_product_has_order_order1`
-    FOREIGN KEY (`detail_order_order_id`)
-    REFERENCES `delilah`.`order` (`order_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+INSERT INTO `delilah`.`user` (`user_fullname`, `user_mail`, `user_phone`, `user_address`, `user_username`, `user_pass`, `rol_id`) VALUES ('Jhon Doe', 'jhondoe@mail.com', '96325871', 'Colon 200', 'jhon', '123', '1');
+INSERT INTO `delilah`.`user` (`user_fullname`, `user_mail`, `user_phone`, `user_address`, `user_username`, `user_pass`, `rol_id`) VALUES ('Fulanito', 'fulano@mail.com', '74125896', 'Maipu 500', 'fulano', '321', '2');
+---------------------------------------------------------------------------------------------------
+INSERT INTO `delilah`.`payment` (`payment_id`, `payment_method`) VALUES ('1', 'Efectivo');
+INSERT INTO `delilah`.`payment` (`payment_id`, `payment_method`) VALUES ('2', 'Tarjeta');
+---------------------------------------------------------------------------------------------------
+INSERT INTO `delilah`.`state` (`state_id`, `state_name`) VALUES ('1', 'Nuevo');
+INSERT INTO `delilah`.`state` (`state_id`, `state_name`) VALUES ('2', 'Confirmado');
+INSERT INTO `delilah`.`state` (`state_id`, `state_name`) VALUES ('3', 'Preparando');
+INSERT INTO `delilah`.`state` (`state_id`, `state_name`) VALUES ('4', 'Enviando');
+INSERT INTO `delilah`.`state` (`state_id`, `state_name`) VALUES ('5', 'Entregado');
+---------------------------------------------------------------------------------------------------
+INSERT INTO `delilah`.`product` (`product_id`, `product_name`, `product_price`) VALUES ('1', 'Hamburguesa', '150');
+INSERT INTO `delilah`.`product` (`product_id`, `product_name`, `product_price`) VALUES ('2', 'Lomito', '250');
+INSERT INTO `delilah`.`product` (`product_id`, `product_name`, `product_price`) VALUES ('3', 'Pizza', '200');
+----------------------------------------------------------------------------------------------------
+INSERT INTO `delilah`.`rol` (`rol_id`, `rol_name`) VALUES ('1', 'Admin');
+INSERT INTO `delilah`.`rol` (`rol_id`, `rol_name`) VALUES ('2', 'User');
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
