@@ -26,7 +26,7 @@ const rolAuthentication = (req, res, next) => {
                 const rol = userRolValid
 
             if (rol != 1) {
-                    res.send('NO TIENE PERMISO PARA REALIZAR LA TAREA')
+                    res.send('ERROR: You are not authorized to do the task')
                 }
                     else{
                         next()

@@ -48,9 +48,26 @@ router
                         } else {
                             res.status(400).json({message:'Id must be a number'})
                             console.log('Id must be a number')
-                        }
-                    
+                        }                   
+        })
 
+        .delete('/order/:id', async (req, res) => {
+                try {
+                        const id = req.params.id
+                        if (!isNaN(id)) {
+                                try {
+                                            await controller.deleteOrderById(sequelize, id)
+                                            res.status(200).json({message: 'Successful application, the ORDER has been DELETED'})
+                                } catch (error) {
+                                    res.sendStatus(500).json({ message: errorMessage })    
+                                }   
+                        } else {
+                            res.status(400).json({message:'Id must be a number'})
+                            console.log('Id must be a number')
+                        }
+                } catch (error) {
+                    res.json(error,'An error has occurred')
+                }
         })
 
 module.exports = router

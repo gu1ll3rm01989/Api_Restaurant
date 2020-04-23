@@ -257,7 +257,21 @@ Ejemplo de respuesta de la peticion
 }
 ~~~
 
-10. CREACION DE PRODUCTOS PARA ROL DE ADMINISTRADOR  
+10. ELIMINAR ORDEN PARA ROL DE ADMINISTRADOR  
+Previamente ingresar con usuario que tenga rol de administrador (1) Ver punto 2
+
+#### DELETE /api/v1/order/{order_id}
+
+
+Ejemplo de respuesta de la peticion
+
+~~~
+{  
+        "message": "Successful application, the ORDER has been DELETED"          
+}
+~~~
+
+11. CREACION DE PRODUCTOS PARA ROL DE ADMINISTRADOR  
 Previamente ingresar con usuario que tenga rol de administrador (1) Ver punto 2
 #### POST /api/v1/products
 
@@ -278,7 +292,7 @@ Ejemplo de respuesta de la peticion
 }
 ~~~
 
-11. MODIFICACION DE PRODUCTOS PARA ROL DE ADMINISTRADOR  
+12. MODIFICACION DE PRODUCTOS PARA ROL DE ADMINISTRADOR  
 Previamente ingresar con usuario que tenga rol de administrador (1) Ver punto 2
 
 #### PUT /api/v1/products/{products_id}
@@ -300,7 +314,7 @@ Ejemplo de respuesta de la peticion
 }
 ~~~
 
-12. ELIMINAR PRODUCTOS PARA ROL DE ADMINISTRADOR  
+13. ELIMINAR PRODUCTOS PARA ROL DE ADMINISTRADOR  
 Previamente ingresar con usuario que tenga rol de administrador (1) Ver punto 2
 
 #### DELETE /api/v1/products/{products_id}

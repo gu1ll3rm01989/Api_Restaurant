@@ -113,6 +113,15 @@ const Order = require ('./order.model')
         }
     }
 
+    const deleteOrderById = async (sequelize, id) => {
+        try {
+            await sequelize.query(`DELETE FROM delilah.order WHERE order_id = ?`,
+            {replacements: [id]})
+        } catch (error) {
+            console.log('ERROR: ' + error)
+        }
+    }
+
 
 
 module.exports = {
@@ -120,5 +129,6 @@ module.exports = {
     orderStatusUsername,
     orderStatusProduct,
     updateStateOrderByID,
-    showOrder
+    showOrder,
+    deleteOrderById
 }
